@@ -302,6 +302,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ModelsView\VievPRODUCTS.cs" />
+    <Compile Include="ModelsView\ViewCATEGORIES.cs" />
     <Compile Include="Models\Categories.cs" />
     <Compile Include="Models\CustomerDemographics.cs" />
     <Compile Include="Models\Customers.cs" />
