@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using Ihu.Umran.DataDAL.ModelsView;
 using Ihu.Umran.DataDAL.Models;
 using System.Web;
-
+using System.Data.Entity;
+using Kendo.Mvc.Extensions;
+using Kendo.Mvc.UI;
 
 namespace Ihu.Umran.DataBLL.Services
 {
@@ -45,21 +47,22 @@ namespace Ihu.Umran.DataBLL.Services
         //}
 
         private static bool UpdateDatabase = false;
-        private NorthwindEntities entities;
+        public NorthwindEntities Entities = new NorthwindEntities();
 
-        public ServicePRODUCTS (NorthwindEntities entities)
-        {
-            this.entities = entities;
-        }
+        //public ServicePRODUCTS(NorthwindEntities entities)
+        //{
+        //    this.Entities =entities ;
+        //}
 
         public IList<VievPRODUCTS> GetAll()
         {
 
-            var result = HttpContext.Session["Products"] as IList<VievPRODUCTS>;
+            //var result = HttpContext.Session["Products"] as IList<VievPRODUCTS>;
+            List<VievPRODUCTS> result = new List<VievPRODUCTS>();
 
-            if (result == null || UpdateDatabase)
-            {
-                result = entities.Products.Select(product => new VievPRODUCTS
+            //if (result == null || UpdateDatabase)
+            //{
+            result = Entities.Products.Select(product => new VievPRODUCTS
                 {
                     ProductID = product.ProductID,
                     ProductName = product.ProductName,
@@ -71,16 +74,18 @@ namespace Ihu.Umran.DataBLL.Services
                     UnitsOnOrder = product.UnitsOnOrder.HasValue ? product.UnitsOnOrder.Value : default(short),
                     ReorderLevel = product.ReorderLevel,
                     Discontinued = product.Discontinued,
-                    Category = new Categories()
+                    Category = new ViewCATEGORIES()
                     {
-                        CategoryID = product.Category.CategoryID,
-                        CategoryName = product.Category.CategoryName
+                        CategoryID = product.Categories.CategoryID,
+                        CategoryName = product.Categories.CategoryName
                     },
-                    LastSupply = DateTime.Today
+
+
+
                 }).ToList();
 
-                HttpContext.Current.Session["Products"] = result;
-            }
+            //    HttpContext.Current.Session["Products"] = result;
+            //}
 
             return result;
         }
@@ -106,7 +111,7 @@ namespace Ihu.Umran.DataBLL.Services
 
                 if (product.Category == null)
                 {
-                    product.Category = new CategoryViewModel() { CategoryID = 1, CategoryName = "Beverages" };
+                    product.Category = new ViewCATEGORIES() { CategoryID = 1, CategoryName = "Beverages" };
                 }
 
                 GetAll().Insert(0, product);
@@ -131,8 +136,8 @@ namespace Ihu.Umran.DataBLL.Services
                     entity.CategoryID = product.Category.CategoryID;
                 }
 
-                entities.Products.Add(entity);
-                entities.SaveChanges();
+                Entities.Products.Add(entity);
+                Entities.SaveChanges();
 
                 product.ProductID = entity.ProductID;
             }
@@ -162,10 +167,10 @@ namespace Ihu.Umran.DataBLL.Services
                     }
                     else
                     {
-                        product.Category = new CategoryViewModel()
+                        product.Category = new ViewCATEGORIES()
                         {
                             CategoryID = (int)product.CategoryID,
-                            CategoryName = entities.Categories.Where(s => s.CategoryID == product.CategoryID).Select(s => s.CategoryName).First()
+                            CategoryName = Entities.Categories.Where(s => s.CategoryID == product.CategoryID).Select(s => s.CategoryName).First()
                         };
                     }
 
@@ -189,9 +194,9 @@ namespace Ihu.Umran.DataBLL.Services
                     entity.CategoryID = product.Category.CategoryID;
                 }
 
-                entities.Products.Attach(entity);
-                entities.Entry(entity).State = EntityState.Modified;
-                entities.SaveChanges();
+                Entities.Products.Attach(entity);
+                Entities.Entry(entity).State = EntityState.Modified;
+                Entities.SaveChanges();
             }
         }
 
@@ -211,18 +216,18 @@ namespace Ihu.Umran.DataBLL.Services
 
                 entity.ProductID = product.ProductID;
 
-                entities.Products.Attach(entity);
+                Entities.Products.Attach(entity);
 
-                entities.Products.Remove(entity);
+                Entities.Products.Remove(entity);
 
-                var orderDetails = entities.Order_Details.Where(pd => pd.ProductID == entity.ProductID);
+                var orderDetails = Entities.Order_Details.Where(pd => pd.ProductID == entity.ProductID);
 
                 foreach (var orderDetail in orderDetails)
                 {
-                    entities.Order_Details.Remove(orderDetail);
+                    Entities.Order_Details.Remove(orderDetail);
                 }
 
-                entities.SaveChanges();
+                Entities.SaveChanges();
             }
         }
 
@@ -233,7 +238,7 @@ namespace Ihu.Umran.DataBLL.Services
 
         public void Dispose()
         {
-            entities.Dispose();
+            Entities.Dispose();
         }
 
     }

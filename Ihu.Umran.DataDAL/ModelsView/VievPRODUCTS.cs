@@ -1,19 +1,25 @@
-﻿using System;
+﻿
+namespace Ihu.Umran.DataDAL.ModelsView
+{using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ihu.Umran.DataDAL.Models;
-namespace Ihu.Umran.DataDAL.ModelsView
-{
-    
-   
+using System.ComponentModel.DataAnnotations;
+  
+
+
 
     public class VievPRODUCTS
     {
+        public ViewCATEGORIES Category;
+
+        [Key]
         public int ProductID { get; set; }
 
-
+        [Required]
+        [StringLength(40)]
         public string ProductName { get; set; }
 
         public int? SupplierID { get; set; }
@@ -40,6 +46,6 @@ namespace Ihu.Umran.DataDAL.ModelsView
         public virtual ICollection<Order_Details> Order_Details { get; set; }
 
         public virtual Suppliers Suppliers { get; set; }
-
+        //public ViewCATEGORIES Category { get; set; }
     }
 }

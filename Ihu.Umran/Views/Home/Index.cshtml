@@ -1,10 +1,9 @@
 ﻿
-@*@using System.Collections.Generic;
-@using System.Web.Optimization
+@using System.Collections.Generic;
 @using Kendo.Mvc.Extensions
 @using Kendo.Mvc.UI
 @using Kendo.Mvc.UI.Fluent
-@using Kendo.Mvc*@
+@using Kendo.Mvc
 
 
 @{
@@ -18,50 +17,94 @@
 </div>
 
 @*<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
-</div>*@
+        <div class="col-md-4">
+            <h2>Getting started</h2>
+            <p>
+                ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
+                enables a clean separation of concerns and gives you full control over markup
+                for enjoyable, agile development.
+            </p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+            <h2>Get more libraries</h2>
+            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+            <h2>Web Hosting</h2>
+            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+        </div>
+    </div>*@
 
 
 @model IEnumerable<Ihu.Umran.DataDAL.ModelsView.VievPRODUCTS>
 
-@(Html.Kendo().Grid(Model)
-                                                        .Name("Grid")
-                                                         .Columns(columns =>
-                                                         {
-                                                             columns.Bound(p => p.ProductName).Title("Product Name");
-                                                             columns.Bound(p => p.UnitPrice).Title("Unit Price").Width(130);
-                                                             columns.Bound(p => p.UnitsInStock).Title("Units In Stock").Width(130);
-                                                             columns.Bound(p => p.Discontinued).Width(130);
-                                                         })
-                                                         .HtmlAttributes(new { style = "height: 550px;" })
-                                                         .Pageable(pageable => pageable
-                                                            .Input(true)
-                                                            .Numeric(false)
-                                                          )
-                                                         .Sortable()
-                                                         .Scrollable(scr => scr.Height(430))
-                                                         .Filterable()
-                                                         .DataSource(dataSource => dataSource
-                                                             .Ajax()
-                                                             .PageSize(20)
-                                                             .ServerOperation(false)
-                                                          )
+@*@(Html.Kendo().Grid(Model)
+                                                                .Name("Grid")
+                                                                 .Columns(columns =>
+                                                                 {
+                                                                     columns.Bound(p => p.ProductName).Title("Product Name");
+                                                                     columns.Bound(p => p.UnitPrice).Title("Unit Price").Width(130);
+                                                                     columns.Bound(p => p.UnitsInStock).Title("Units In Stock").Width(130);
+                                                                     columns.Bound(p => p.Discontinued).Width(130);
+                                                                 })
+                                                                 .HtmlAttributes(new { style = "height: 550px;" })
+                                                                 .Pageable(pageable => pageable
+                                                                    .Input(true)
+                                                                    .Numeric(false)
+                                                                  )
+                                                                 .Sortable()
+                                                                 .Scrollable(scr => scr.Height(430))
+                                                                 .Filterable()
+                                                                 .DataSource(dataSource => dataSource
+                                                                     .Ajax()
+                                                                     .PageSize(20)
+                                                                     .ServerOperation(false)
+                                                                  )
+    )*@
+
+
+@(Html.Kendo().Grid < Ihu.Umran.DataDAL.ModelsView.VievPRODUCTS>(Model)
+        .Name("grid")
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.ProductName);
+            columns.Bound(p => p.UnitPrice).Width(120);
+            columns.Bound(p => p.UnitsInStock).Width(120);
+            columns.Bound(p => p.Discontinued).Width(120);
+            columns.Command(command => { command.Edit(); command.Destroy(); }).Width(250);
+        })
+        .ToolBar(toolbar => toolbar.Create())
+        .Editable(editable => editable.Mode(GridEditMode.PopUp))
+        .Pageable()
+        .Sortable()
+        .Scrollable()
+        .HtmlAttributes(new { style = "height:550px;" })
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(20)
+            .Events(events => events.Error("error_handler"))
+            .Model(model => model.Id(p => p.ProductID))
+            .Create(update => update.Action("EditingPopup_Create", "Grid"))
+            .Read(read => read.Action("EditingPopup_Read", "Grid"))
+            .Update(update => update.Action("EditingPopup_Update", "Grid"))
+            .Destroy(update => update.Action("EditingPopup_Destroy", "Grid"))
+        )
 )
+<script type="text/javascript">
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+</script>
